@@ -14,10 +14,10 @@ import torch.nn as nn
 from torch.nn import Conv1d, ConvTranspose1d
 from torch.nn.utils import weight_norm, remove_weight_norm
 
-import activations
-from utils import init_weights, get_padding
-from alias_free_activation.torch.act import Activation1d as TorchActivation1d
-from env import AttrDict
+import bigvgan.activations as activations
+from bigvgan.utils import init_weights, get_padding
+from bigvgan.alias_free_activation.torch.act import Activation1d as TorchActivation1d
+from bigvgan.env import AttrDict
 
 from huggingface_hub import PyTorchModelHubMixin, hf_hub_download
 
@@ -50,7 +50,7 @@ class AMPBlock1(torch.nn.Module):
         activation: str = None,
     ):
         super().__init__()
-        
+
         self.h = h
 
         self.convs1 = nn.ModuleList(
@@ -169,7 +169,7 @@ class AMPBlock2(torch.nn.Module):
         activation: str = None,
     ):
         super().__init__()
-        
+
         self.h = h
 
         self.convs = nn.ModuleList(

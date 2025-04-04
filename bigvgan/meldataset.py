@@ -15,7 +15,7 @@ from librosa.filters import mel as librosa_mel_fn
 import pathlib
 from tqdm import tqdm
 from typing import List, Tuple, Optional
-from env import AttrDict
+from bigvgan.env import AttrDict
 
 MAX_WAV_VALUE = 32767.0  # NOTE: 32768.0 -1 to prevent int16 overflow (results in popping sound in corner cases)
 
@@ -227,9 +227,9 @@ class MelDataset(torch.utils.data.Dataset):
 
         print("[INFO] checking dataset integrity...")
         for i in tqdm(range(len(self.audio_files))):
-            assert os.path.exists(
-                self.audio_files[i]
-            ), f"{self.audio_files[i]} not found"
+            assert os.path.exists(self.audio_files[i]), (
+                f"{self.audio_files[i]} not found"
+            )
 
     def __getitem__(
         self, index: int
@@ -318,9 +318,9 @@ class MelDataset(torch.utils.data.Dataset):
             else:
                 # For fine-tuning, assert that the waveform is in the defined sampling_rate
                 # Fine-tuning won't support on-the-fly resampling to be fool-proof (the dataset should have been prepared properly)
-                assert (
-                    source_sampling_rate == self.sampling_rate
-                ), f"For fine_tuning, waveform must be in the spcified sampling rate {self.sampling_rate}, got {source_sampling_rate}"
+                assert source_sampling_rate == self.sampling_rate, (
+                    f"For fine_tuning, waveform must be in the spcified sampling rate {self.sampling_rate}, got {source_sampling_rate}"
+                )
 
                 # Cast ndarray to torch tensor
                 audio = torch.FloatTensor(audio)
@@ -346,8 +346,7 @@ class MelDataset(torch.utils.data.Dataset):
                         mel = mel[:, :, mel_start : mel_start + frames_per_seg]
                         audio = audio[
                             :,
-                            mel_start
-                            * self.hop_size : (mel_start + frames_per_seg)
+                            mel_start * self.hop_size : (mel_start + frames_per_seg)
                             * self.hop_size,
                         ]
 
@@ -378,7 +377,9 @@ class MelDataset(torch.utils.data.Dataset):
             assert (
                 audio.shape[1] == mel.shape[2] * self.hop_size
                 and audio.shape[1] == mel_loss.shape[2] * self.hop_size
-            ), f"Audio length must be mel frame length * hop_size. Got audio shape {audio.shape} mel shape {mel.shape} mel_loss shape {mel_loss.shape}"
+            ), (
+                f"Audio length must be mel frame length * hop_size. Got audio shape {audio.shape} mel shape {mel.shape} mel_loss shape {mel_loss.shape}"
+            )
 
             return (mel.squeeze(), audio.squeeze(0), filename, mel_loss.squeeze())
 
